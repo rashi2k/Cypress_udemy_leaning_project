@@ -2,7 +2,8 @@
 
 describe('First Suit', () => {
   it('test case 1', () => {
-    testMethod1();
+    //testMethod1();
+    insertModuleObject("Financial Statement Template", ['ddfd', "2343", "5678", "9076"]); 
   })
 })
 
@@ -10,7 +11,7 @@ describe('First Suit', () => {
 // How to use 
 // Method 1 (calling async funtion)
 async function testMethod1() {
-  var newCode = await uniqueRandomCodeGenerator(4, "Financial Statement Template");
+  var newCode = await uniqueRandomCodeGenerator(4, "Financial Statement Template222");
   console.log("newCode", newCode);
 }
 
@@ -24,6 +25,20 @@ function testMethod2() {
 
 
 //------------------------------- unique code generator implementation----------------------------------//
+
+async function uniqueRandomCodeGenerator(length, moduleName) {
+  const tries = 15;  // if the code alredy exists, this will continue for 15 attemps.
+  const exisitngCodes = await cy.readFile('cypress/fixtures/generated_codes.json').then((data) => {
+    return data;
+  })
+
+  for (var i = 0; i < tries; i++) {
+    var newCode = randomAlphaNumberic(length);
+    if (!(await isCodeExists(newCode, moduleName, exisitngCodes))) {
+      return newCode;
+    }
+  }
+}
 
 function randomAlphaNumberic(length) {
   const chars =
@@ -69,22 +84,15 @@ async function isCodeExists(code, moduelName, exisitngCodes) {
   }
 }
 
-async function uniqueRandomCodeGenerator(length, moduleName) {
-  const exisitngCodes = await cy.readFile('cypress/fixtures/generated_codes.json').then((data) => {
-    return data;
+
+
+//---------------add new object to the generated_codes file -------//
+
+function insertModuleObject(moduleName, array) {
+  cy.readFile('cypress/fixtures/generated_codes.json').then((exisitngCodes) => {
+    cy.writeFile('cypress/fixtures/generated_codes.json', { ...exisitngCodes, [moduleName]: array })
   })
-
-  // if the code alredy exists we try for new one, this will continue for 15 attemps.
-  for (var i = 0; i < 15; i++) {
-    var newCode = randomAlphaNumberic(length);
-    if (!(await isCodeExists(newCode, moduleName, exisitngCodes))) {
-      return newCode;
-    }
-  }
 }
-
-
-
 
 
 
