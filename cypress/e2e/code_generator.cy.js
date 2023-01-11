@@ -74,6 +74,7 @@ async function uniqueRandomCodeGenerator(length, moduleName) {
     return data;
   })
 
+  // if the code alredy exists we try for new one, this will continue for 15 attemps.
   for (var i = 0; i < 15; i++) {
     var newCode = randomAlphaNumberic(length);
     if (!(await isCodeExists(newCode, moduleName, exisitngCodes))) {
