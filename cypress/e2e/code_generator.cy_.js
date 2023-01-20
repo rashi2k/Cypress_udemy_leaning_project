@@ -1,9 +1,10 @@
 /// <reference types = "Cypress" />
 
+ 
 describe('First Suit', () => {
   it('test case 1', () => {
-    //testMethod1();
-    insertModuleObject("Financial Statement Template", ['ddfd', "2343", "5678", "9076"]); 
+    testMethod1();
+    //insertModuleObject("Financial Statement Template", ['ddfd', "2343", "5678", "9076"]); 
   })
 })
 
@@ -11,7 +12,7 @@ describe('First Suit', () => {
 // How to use 
 // Method 1 (calling async funtion)
 async function testMethod1() {
-  var newCode = await uniqueRandomCodeGenerator(4, "Financial Statement Template222");
+  var newCode = await uniqueRandomCodeGenerator_(4, "Checklist Template");
   console.log("newCode", newCode);
 }
 
@@ -26,11 +27,11 @@ function testMethod2() {
 
 //------------------------------- unique code generator implementation----------------------------------//
 
-async function uniqueRandomCodeGenerator(length, moduleName) {
+async function uniqueRandomCodeGenerator_(length, moduleName) {
   const tries = 15;  // if the code alredy exists, this will continue for 15 attemps.
-  const exisitngCodes = await cy.readFile('cypress/fixtures/generated_codes.json').then((data) => {
-    return data;
-  })
+  const exisitngCodes = await cy.readFile('cypress/fixtures/generated_codes.json');
+
+  console.log("existing codes", exisitngCodes)
 
   for (var i = 0; i < tries; i++) {
     var newCode = randomAlphaNumberic(length);
@@ -40,7 +41,7 @@ async function uniqueRandomCodeGenerator(length, moduleName) {
   }
 }
 
-function randomAlphaNumberic(length) {
+export function randomAlphaNumberic(length) {
   const chars =
     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
   var result = "";
@@ -48,6 +49,13 @@ function randomAlphaNumberic(length) {
   for (var i = length; i > 0; --i)
     result += chars[Math.floor(Math.random() * chars.length)];
 
+    const randomNo =  Math.floor(Math.random() * (3 - 1 + 1) + 1);
+    console.log("randomeno",randomNo)
+    if(randomNo === 1) {
+        result = "AAAD";
+    }else if(randomNo === 2){
+        result = "CL43";
+    }
   return  result;
 }
 
@@ -95,5 +103,45 @@ function insertModuleObject(moduleName, array) {
 }
 
 
+//------------------------------- unique code generator implementation for LOLC workiing ----------------------------------//
+
+export async function uniqueRandomCodeGenerator_lolc(length, moduleName) {
+  const tries = 15; 
+  var newc = await readFile().then((exisitngCodes) =>{
+      console.log("2. exisitngCodes: ", exisitngCodes);
+
+      return new Promise(async (resolve, reject) => {
+          for (var i = 0; i < tries; i++) {
+              var newCode = randomAlphaNumberic(length);
+              if (!(await isCodeExists(newCode, moduleName, exisitngCodes))) {
+                  console.log("3. new code: ", newCode);
+                  resolve(newCode);
+                  break;
+              }
+          }
+      })
+  })
+
+  console.log("newc: ", newc);
+  return newc;
+}
+
+function readFile() {
+  return new Promise((resolve, reject) => {
+      cy.readFile('cypress/fixtures/generated_codes.json').then(data => {
+          console.log("1. data: ", data);
+          resolve(data)
+      })
+  })
+}
+
+
+//usage
+When('Test', () => {
+  uniqueRandomCodeGenerator_lolc(4, moduleName).then((newCode) => {
+      console.log("Final New Code:", newCode);
+      //assert here
+  });
+})
 
 
